@@ -1,0 +1,81 @@
+Sub data()
+    
+    On Error Resume Next
+    
+
+    Dim obj As New DataObject
+   
+    Dim ref As String
+    Dim name As Variant
+
+    
+    finalrow = Cells(Rows.Count, 1).End(xlUp).Row
+    finalcol = Cells(1, Columns.Count).End(xlToLeft).Column
+    
+     x = Cells(3, 6).Value
+     
+    rng = Range(Cells(2, 1), Cells(finalrow, finalcol))
+    
+    With Range("A2:B250")
+            Set name = .Find(x, _
+                LookIn:=xlValues, _
+                Lookat:=xlPart)
+    End With
+    
+    Cells(4, 6).Value = name.Value
+
+    y = WorksheetFunction.VLookup(name.Value, _
+        Range("A2:b200"), 2, False)
+        
+    Cells(5, 6).Value = y
+    
+    txt = Cells(5, 6).Value
+    
+    obj.SetText txt
+    obj.PutInClipboard
+
+End Sub
+
+Private Sub Worksheet_Change(ByVal target As Range)
+    
+    If target.Address = "$F$3" Then
+        Call data
+    ElseIf target.Address = "$F$2" Then
+        Call findLot
+    End If
+    
+    
+End Sub
+Sub findLot()
+
+    On Error Resume Next
+    
+    Dim obj As New DataObject
+    Dim full As Variant
+    Dim loc As Variant
+    Dim left As Variant
+
+   x = Worksheets(1).Cells(2, 6).Value
+   Start = Mid(x, 1, 3)
+   last = Mid(x, 4, 2)
+   
+   x = Start & "-" & last
+   
+   With Worksheets(2).Range("B1:C600")
+        Set full = .Find(x, _
+                LookIn:=xlValues, _
+                Lookat:=xlPart)
+    End With
+    
+    
+    
+    Start = Mid(full, 3, 10)
+    
+    Final = "*" & Start & "|JB"
+    Cells(6, 6).Value = full
+    
+    obj.SetText Final
+    obj.PutInClipboard
+    
+    
+End Sub
